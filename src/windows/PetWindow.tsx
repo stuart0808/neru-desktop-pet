@@ -10,6 +10,48 @@ import { PlanProposalCard } from "../components/chat/PlanProposalCard";
 import { CodexBasketPopover } from "../components/codex/CodexBasketPopover";
 import { useI18n } from "../i18n";
 
+const defaultPetMetrics = {
+  renderWidth: 123,
+  renderHeight: 260,
+  bubbleBottom: 274,
+  layout: {
+    collapsed: { width: 180, height: 300 },
+    expanded: { width: 560, height: 720 }
+  }
+};
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function calculatePetMetrics(naturalWidth: number, naturalHeight: number) {
+  const ratio = naturalWidth > 0 && naturalHeight > 0 ? naturalWidth / naturalHeight : defaultPetMetrics.renderWidth / defaultPetMetrics.renderHeight;
+  const maxRenderWidth = 360;
+  const maxRenderHeight = 260;
+  let renderWidth = maxRenderHeight * ratio;
+  let renderHeight = maxRenderHeight;
+  if (renderWidth > maxRenderWidth) {
+    renderWidth = maxRenderWidth;
+    renderHeight = maxRenderWidth / ratio;
+  }
+  renderWidth = Math.round(clamp(renderWidth, 96, maxRenderWidth));
+  renderHeight = Math.round(clamp(renderHeight, 150, maxRenderHeight));
+  const collapsedWidth = Math.round(clamp(renderWidth + 32, 140, 420));
+  const collapsedHeight = Math.round(clamp(renderHeight + 40, 190, 340));
+  return {
+    renderWidth,
+    renderHeight,
+    bubbleBottom: renderHeight + 14,
+    layout: {
+      collapsed: { width: collapsedWidth, height: collapsedHeight },
+      expanded: {
+        width: Math.round(clamp(Math.max(560, collapsedWidth + 140), 560, 760)),
+        height: Math.round(clamp(Math.max(720, collapsedHeight + 360), 720, 860))
+      }
+    }
+  };
+}
+
 function NeruPet({ state, images, showAlert }: { state: ReturnType<typeof getPetVisualState>; images: Record<ReturnType<typeof getPetVisualState>, string>; showAlert: boolean }) {
   return (
     <span className={`pet-image-wrap pet-${state}`}>
@@ -45,12 +87,14 @@ export function PetWindow() {
   const [codexCreateBusy, setCodexCreateBusy] = React.useState(false);
   const [codexError, setCodexError] = React.useState("");
   const [lastInteractionAt, setLastInteractionAt] = React.useState(() => Date.now());
+  const [petMetrics, setPetMetrics] = React.useState(defaultPetMetrics);
   const clickTimerRef = React.useRef<number | null>(null);
   const miniCloseTimerRef = React.useRef<number | null>(null);
   const toastTimerRef = React.useRef<number | null>(null);
   const miniInputRef = React.useRef<HTMLInputElement | null>(null);
   const pointerStartRef = React.useRef<{ screenX: number; screenY: number } | null>(null);
   const didDragRef = React.useRef(false);
+  const sentLayoutRef = React.useRef("");
   const hasOverdueOpenTodo = React.useMemo(
     () => todos.some((todo) => isOverdueOpenTodo(todo, now)),
     [todos, now]
@@ -72,6 +116,15 @@ export function PetWindow() {
   const currentPetImages = React.useMemo(
     () => mergePetImages(petStateImages, settings?.petAppearance?.images),
     [settings?.petAppearance?.images]
+  );
+  const petStageStyle = React.useMemo(
+    () => ({
+      ...themeStyle,
+      "--pet-render-width": `${petMetrics.renderWidth}px`,
+      "--pet-render-height": `${petMetrics.renderHeight}px`,
+      "--pet-bubble-bottom": `${petMetrics.bubbleBottom}px`
+    } as React.CSSProperties),
+    [petMetrics.bubbleBottom, petMetrics.renderHeight, petMetrics.renderWidth, themeStyle]
   );
 
   void pendingPlan;
@@ -133,6 +186,25 @@ export function PetWindow() {
     if (!api || dragging) return;
     void api.app.setPetWindowExpanded(chatOpen || codexBasketOpen);
   }, [api, chatOpen, codexBasketOpen, dragging]);
+
+  React.useEffect(() => {
+    const image = new Image();
+    image.onload = () => {
+      setPetMetrics(calculatePetMetrics(image.naturalWidth, image.naturalHeight));
+    };
+    image.onerror = () => {
+      setPetMetrics(defaultPetMetrics);
+    };
+    image.src = currentPetImages.idle;
+  }, [currentPetImages.idle]);
+
+  React.useEffect(() => {
+    if (!api) return;
+    const serialized = JSON.stringify(petMetrics.layout);
+    if (sentLayoutRef.current === serialized) return;
+    sentLayoutRef.current = serialized;
+    void api.app.setPetWindowLayout(petMetrics.layout);
+  }, [api, petMetrics.layout]);
 
   React.useEffect(() => {
     return () => {
@@ -406,7 +478,7 @@ export function PetWindow() {
   return (
     <main
       className={`shell pet-only ${chatOpen ? "chat-open" : ""} ${codexBasketOpen ? "codex-basket-open" : ""} ${codexDragActive ? "codex-drag-active" : ""}`}
-      style={themeStyle}
+      style={petStageStyle}
       onDragEnter={handleCodexDragOver}
       onDragOver={handleCodexDragOver}
       onDragLeave={handleCodexDragLeave}

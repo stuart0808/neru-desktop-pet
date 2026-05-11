@@ -8,11 +8,59 @@ import { broadcastSnapshotUpdated } from "./broadcast.js";
 import { getPreloadPath, getRendererUrl, getAppIconPath, getTrayIcon, getWorkspaceInitialBounds, lockdownWindow, normalizeAccelerator } from "./windowUtils.js";
 import { syncGlobalSelectionHook, setOpenSelectionPopoverWindow } from "./selection.js";
 import { setOpenWorkspaceWindow } from "./reminder.js";
-import type { AppSettings, SelectionCapture, SelectionTextResult } from "../../shared/types.js";
+import type { AppSettings, PetWindowLayout, SelectionCapture, SelectionTextResult } from "../../shared/types.js";
 import { resolveLocale, translate } from "../../shared/i18n.js";
 
 const store = new JsonStore();
 const appUserModelId = "com.local.neru";
+
+function isTransparentPetMode(): boolean {
+  return app.isPackaged || process.env.DESKTOP_PET_TRANSPARENT === "1";
+}
+
+function getPetWindowTargetBounds(expanded: boolean) {
+  return expanded ? state.petWindowLayout.expanded : state.petWindowLayout.collapsed;
+}
+
+function clampWindowSize(value: number, min: number, max: number): number {
+  return Math.round(Math.min(max, Math.max(min, value)));
+}
+
+function sanitizePetWindowLayout(layout: PetWindowLayout): PetWindowLayout {
+  const display = state.mainWindow && !state.mainWindow.isDestroyed()
+    ? screen.getDisplayMatching(state.mainWindow.getBounds())
+    : screen.getPrimaryDisplay();
+  const { width: workWidth, height: workHeight } = display.workAreaSize;
+  const maxCollapsedWidth = Math.max(collapsedPetBounds.width, Math.floor(workWidth * 0.62));
+  const maxCollapsedHeight = Math.max(collapsedPetBounds.height, Math.floor(workHeight * 0.72));
+  const collapsed = {
+    width: clampWindowSize(layout.collapsed.width, 120, maxCollapsedWidth),
+    height: clampWindowSize(layout.collapsed.height, 180, maxCollapsedHeight)
+  };
+  const expanded = {
+    width: clampWindowSize(layout.expanded.width, Math.max(expandedPetBounds.width, collapsed.width), Math.floor(workWidth * 0.94)),
+    height: clampWindowSize(layout.expanded.height, Math.max(expandedPetBounds.height, collapsed.height), Math.floor(workHeight * 0.92))
+  };
+  return { collapsed, expanded };
+}
+
+function applyPetWindowBounds(target: { width: number; height: number }): void {
+  if (!state.mainWindow || state.mainWindow.isDestroyed()) return;
+  const bounds = state.mainWindow.getBounds();
+  if (bounds.width === target.width && bounds.height === target.height) return;
+  const centerX = bounds.x + bounds.width / 2;
+  const bottomY = bounds.y + bounds.height;
+  const workArea = screen.getDisplayMatching(bounds).workArea;
+  const nextX = Math.min(
+    Math.max(Math.round(centerX - target.width / 2), workArea.x),
+    workArea.x + workArea.width - target.width
+  );
+  const nextY = Math.min(
+    Math.max(Math.round(bottomY - target.height), workArea.y),
+    workArea.y + workArea.height - target.height
+  );
+  state.mainWindow.setBounds({ x: nextX, y: nextY, width: target.width, height: target.height });
+}
 
 export function ensureWindowsNotificationShortcut(): void {
   if (process.platform !== "win32") return;
@@ -31,10 +79,11 @@ export function ensureWindowsNotificationShortcut(): void {
 
 export async function createWindow(): Promise<void> {
   const settings = await store.getSettings();
-  const transparentMode = app.isPackaged || process.env.DESKTOP_PET_TRANSPARENT === "1";
+  const transparentMode = isTransparentPetMode();
+  const initialBounds = transparentMode ? getPetWindowTargetBounds(false) : expandedPetBounds;
   state.mainWindow = new BrowserWindow({
-    width: transparentMode ? collapsedPetBounds.width : expandedPetBounds.width,
-    height: transparentMode ? collapsedPetBounds.height : expandedPetBounds.height,
+    width: initialBounds.width,
+    height: initialBounds.height,
     minWidth: transparentMode ? 180 : 260,
     minHeight: transparentMode ? 200 : 340,
     x: 80,
@@ -76,11 +125,12 @@ export async function createWindow(): Promise<void> {
   });
   state.mainWindow.once("ready-to-show", () => {
     if (!state.mainWindow) return;
+    const readyBounds = transparentMode ? getPetWindowTargetBounds(state.petWindowExpanded) : expandedPetBounds;
     state.mainWindow.setBounds({
       x: 80,
       y: 80,
-      width: transparentMode ? collapsedPetBounds.width : expandedPetBounds.width,
-      height: transparentMode ? collapsedPetBounds.height : expandedPetBounds.height
+      width: readyBounds.width,
+      height: readyBounds.height
     });
     state.mainWindow.show();
     state.mainWindow.focus();
@@ -90,26 +140,23 @@ export async function createWindow(): Promise<void> {
 }
 
 export function setPetWindowExpanded(expanded: boolean): void {
-  if (!state.mainWindow || (!app.isPackaged && process.env.DESKTOP_PET_TRANSPARENT !== "1")) return;
+  state.petWindowExpanded = expanded;
+  if (!state.mainWindow || !isTransparentPetMode()) return;
   if (state.windowDragState?.window === state.mainWindow) {
     state.pendingPetExpanded = expanded;
     return;
   }
-  const target = expanded ? expandedPetBounds : collapsedPetBounds;
-  const bounds = state.mainWindow.getBounds();
-  if (bounds.width === target.width && bounds.height === target.height) return;
-  const centerX = bounds.x + bounds.width / 2;
-  const bottomY = bounds.y + bounds.height;
-  const workArea = screen.getDisplayMatching(bounds).workArea;
-  const nextX = Math.min(
-    Math.max(Math.round(centerX - target.width / 2), workArea.x),
-    workArea.x + workArea.width - target.width
-  );
-  const nextY = Math.min(
-    Math.max(Math.round(bottomY - target.height), workArea.y),
-    workArea.y + workArea.height - target.height
-  );
-  state.mainWindow.setBounds({ x: nextX, y: nextY, width: target.width, height: target.height });
+  applyPetWindowBounds(getPetWindowTargetBounds(expanded));
+}
+
+export function setPetWindowLayout(layout: PetWindowLayout): void {
+  state.petWindowLayout = sanitizePetWindowLayout(layout);
+  if (!state.mainWindow || !isTransparentPetMode()) return;
+  if (state.windowDragState?.window === state.mainWindow) {
+    state.pendingPetExpanded = state.petWindowExpanded;
+    return;
+  }
+  applyPetWindowBounds(getPetWindowTargetBounds(state.petWindowExpanded));
 }
 
 export async function triggerQuickAiRecord(): Promise<void> {

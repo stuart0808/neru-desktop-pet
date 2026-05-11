@@ -83,6 +83,7 @@ const api: DesktopPetApi = {
     },
     endWindowDrag: () => ipcRenderer.invoke("app:endWindowDrag"),
     setPetWindowExpanded: (expanded) => ipcRenderer.invoke("app:setPetWindowExpanded", expanded),
+    setPetWindowLayout: (layout) => ipcRenderer.invoke("app:setPetWindowLayout", layout),
     openWorkspaceWindow: (todoId) => ipcRenderer.invoke("app:openWorkspaceWindow", todoId),
     checkForUpdates: () => ipcRenderer.invoke("app:checkForUpdates"),
     getPathForFile: (file) => webUtils.getPathForFile(file),

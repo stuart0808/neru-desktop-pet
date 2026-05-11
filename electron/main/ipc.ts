@@ -35,12 +35,12 @@ import {
   stopCodexRuntimeSession, publicCodexSessionInfo, clearClosedCodexTempSessions
 } from "./codex.js";
 import {
-  setPetWindowExpanded, openWorkspaceWindow, openSelectionResultWindow,
+  setPetWindowExpanded, setPetWindowLayout, openWorkspaceWindow, openSelectionResultWindow,
   processSelectionResultInBackground, resizeSelectionPopoverWindow,
   resolveAiConfig, beginWindowDrag, dragWindowToCursor, endWindowDrag, registerQuickAiRecordShortcut, refreshTrayMenu
 } from "./window.js";
 import { checkForUpdates } from "./updates.js";
-import type { ChatResult, CodexDropItem, CodexSessionHistory, ConversationMessage, PetAppearance, ReminderItem, SelectionTextResult, TodoCandidate, TodoItem } from "../../shared/types.js";
+import type { ChatResult, CodexDropItem, CodexSessionHistory, ConversationMessage, PetAppearance, PetWindowLayout, ReminderItem, SelectionTextResult, TodoCandidate, TodoItem } from "../../shared/types.js";
 import type { OpenDialogOptions } from "electron";
 import { resolveLocale, translate } from "../../shared/i18n.js";
 
@@ -204,6 +204,28 @@ async function scanPetAppearanceFolder(directory: string): Promise<PetAppearance
   return { name: roleName, directory, images };
 }
 
+function validatePetWindowLayout(value: unknown): PetWindowLayout {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("Invalid pet window layout.");
+  }
+  const layout = value as Record<string, unknown>;
+  const readSize = (key: "collapsed" | "expanded") => {
+    const size = layout[key];
+    if (size === null || typeof size !== "object" || Array.isArray(size)) {
+      throw new Error(`Invalid pet window layout ${key}.`);
+    }
+    const record = size as Record<string, unknown>;
+    return {
+      width: validateFiniteNumber(record.width, `${key}.width`),
+      height: validateFiniteNumber(record.height, `${key}.height`)
+    };
+  };
+  return {
+    collapsed: readSize("collapsed"),
+    expanded: readSize("expanded")
+  };
+}
+
 export function registerIpc(): void {
   ipcMain.handle("app:snapshot", () => store.snapshot());
   ipcMain.handle("app:setIgnoreMouseEvents", (_event, ignore: unknown) => {
@@ -228,6 +250,9 @@ export function registerIpc(): void {
   });
   ipcMain.handle("app:setPetWindowExpanded", (_event, expanded: unknown) => {
     setPetWindowExpanded(validateBoolean(expanded, "expanded"));
+  });
+  ipcMain.handle("app:setPetWindowLayout", (_event, layout: unknown) => {
+    setPetWindowLayout(validatePetWindowLayout(layout));
   });
   ipcMain.handle("app:openWorkspaceWindow", (_event, todoId?: unknown) => openWorkspaceWindow(todoId === undefined ? undefined : validateStringId(todoId, "todoId")));
   ipcMain.handle("app:checkForUpdates", () => checkForUpdates(true));

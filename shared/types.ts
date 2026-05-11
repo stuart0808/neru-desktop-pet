@@ -84,6 +84,17 @@ export interface PetAppearance {
   images: Partial<Record<string, string>>;
 }
 
+export interface PetWindowLayout {
+  collapsed: {
+    width: number;
+    height: number;
+  };
+  expanded: {
+    width: number;
+    height: number;
+  };
+}
+
 export interface TodoCandidate {
   title: string;
   notes?: string;
@@ -383,6 +394,7 @@ export interface DesktopPetApi {
     dragWindowToCursor(): Promise<void>;
     endWindowDrag(): Promise<void>;
     setPetWindowExpanded(expanded: boolean): Promise<void>;
+    setPetWindowLayout(layout: PetWindowLayout): Promise<void>;
     openWorkspaceWindow(todoId?: string): Promise<void>;
     checkForUpdates(): Promise<void>;
     getPathForFile(file: File): string;

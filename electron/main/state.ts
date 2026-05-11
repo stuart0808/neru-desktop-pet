@@ -20,6 +20,10 @@ export interface CodexRuntimeSession extends CodexSessionInfo {
 
 export const collapsedPetBounds = { width: 180, height: 300 };
 export const expandedPetBounds = { width: 560, height: 720 };
+export const defaultPetWindowLayout = {
+  collapsed: collapsedPetBounds,
+  expanded: expandedPetBounds
+};
 export const workspacePreferredBounds = { width: 1680, height: 820, minWidth: 1600, minHeight: 700 };
 export const selectionPopoverCollapsedBounds = { width: 38, height: 38 };
 export const selectionPopoverExpandedBounds = { width: 372, height: 38 };
@@ -42,6 +46,8 @@ export const state = {
   codexSessions: new Map<string, CodexRuntimeSession>(),
   windowDragState: null as { window: BrowserWindow; offsetX: number; offsetY: number } | null,
   pendingPetExpanded: null as boolean | null,
+  petWindowExpanded: false,
+  petWindowLayout: defaultPetWindowLayout,
   globalSelectionHookStarted: false,
   globalMouseDown: null as { x: number; y: number; time: number; moved: boolean } | null,
   mainWindowIgnoringMouseEvents: false,
