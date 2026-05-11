@@ -1,7 +1,7 @@
 import React from "react";
 import { FolderOpen, ListTodo, Send, Sparkles, Square } from "lucide-react";
 import type { CodexApprovalPolicy, CodexModelSummary, CodexPendingRequest, CodexSandboxPolicy, CodexSessionInfo, CodexThreadSummary, CodexUiActivity, CodexUiMessage, DesktopPetApi } from "../../../shared/types";
-import { applyCodexThreadEventToSession, applyCodexUiEvent, getCodexActiveThreadSettings, getCodexEventThreadId, getCodexInputSuggestions, getNextCodexInputHistory, handleLocalCodexCommand, rememberCodexInput, resolveCodexDisplayPath } from "../../utils/codexHelpers";
+import { applyCodexThreadEventToSession, applyCodexUiEvent, getCodexActiveThreadSettings, getCodexEventThreadId, getCodexInputSuggestions, getNextCodexInputHistory, handleLocalCodexCommand, rememberCodexInput, resolveCodexDisplayPath, translateCodexStatusText } from "../../utils/codexHelpers";
 import { MarkdownText } from "./MarkdownText";
 import { CodexRequestCard, getCodexRequestActions, isCommandExecutionApprovalRequest } from "./CodexRequestCard";
 import { CodexActivityDrawer, CodexResumePicker, CodexSuggestionPicker, CodexThinkingMessage, CodexThreadBadges } from "./CodexUIComponents";
@@ -426,7 +426,7 @@ export function CodexEmbeddedConversation({
           <button type="button" onClick={() => void openResumePicker()} disabled={status === "starting"}><ListTodo size={14} /> {t("线程")}</button>
           <button type="button" onClick={() => void newThread()} disabled={status === "starting"}><Sparkles size={14} /> {t("新建线程")}</button>
           <button type="button" onClick={() => void stopSession()} disabled={status !== "running"}><Square size={14} /> {t("停止")}</button>
-          <span className={`codex-status ${status}`}>{statusText}</span>
+          <span className={`codex-status ${status}`}>{translateCodexStatusText(statusText, t)}</span>
         </div>
       </header>
       <div className="codex-message-list">

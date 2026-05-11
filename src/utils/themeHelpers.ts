@@ -1,7 +1,7 @@
 import type React from "react";
 
-export function createWorkspaceThemeStyle(color = "#5aa982"): React.CSSProperties {
-  const accent = /^#[0-9a-fA-F]{6}$/.test(color) ? color : "#5aa982";
+export function createWorkspaceThemeStyle(color = "#4d8fc8"): React.CSSProperties {
+  const accent = /^#[0-9a-fA-F]{6}$/.test(color) ? color : "#4d8fc8";
   return {
     "--workspace-accent": accent,
     "--workspace-bg": mixHex(accent, "#ffffff", 0.86),

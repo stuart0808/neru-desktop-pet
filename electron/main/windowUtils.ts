@@ -1,4 +1,5 @@
 import { app, BrowserWindow, nativeImage, screen, shell } from "electron";
+import { existsSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, join } from "node:path";
 import { workspacePreferredBounds } from "./state.js";
@@ -21,15 +22,35 @@ export function getRendererUrl(windowMode?: "workspace" | "selection-result" | "
 }
 
 export function getAppIconPath() {
-  return join(__dirname, "../../../src/assets/app/neru-icon.ico");
+  return resolveAppAssetPath("neru-icon.ico");
 }
 
 export function getNotificationIconPath() {
-  return join(__dirname, "../../../src/assets/app/neru-icon.png");
+  return resolveAppAssetPath("neru-icon.png");
 }
 
 export function getTrayIcon() {
-  return nativeImage.createFromPath(getAppIconPath()).resize({ width: 16, height: 16 });
+  const image = nativeImage.createFromPath(getNotificationIconPath());
+  return image.isEmpty()
+    ? nativeImage.createFromPath(getAppIconPath()).resize({ width: 16, height: 16 })
+    : image.resize({ width: 16, height: 16 });
+}
+
+export function getShortcutIconPath() {
+  return app.isPackaged && process.platform === "win32" ? process.execPath : getAppIconPath();
+}
+
+function resolveAppAssetPath(name: "neru-icon.ico" | "neru-icon.png") {
+  const candidates = app.isPackaged
+    ? [
+        join(app.getAppPath(), "src", "assets", "app", name),
+        join(process.resourcesPath, "app.asar", "src", "assets", "app", name),
+        join(process.resourcesPath, "app", "src", "assets", "app", name)
+      ]
+    : [
+        join(__dirname, "../../../src/assets/app", name)
+      ];
+  return candidates.find((candidate) => existsSync(candidate)) ?? candidates[0];
 }
 
 // Computed once at startup so every window shares the same allowed base.

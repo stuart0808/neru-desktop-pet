@@ -117,7 +117,10 @@ export function assertAppSettings(v: unknown): AppSettings {
       : "CommandOrControl+Shift+Space",
     workspaceThemeColor: typeof o["workspaceThemeColor"] === "string" && /^#[0-9a-fA-F]{6}$/.test(o["workspaceThemeColor"])
       ? o["workspaceThemeColor"]
-      : "#5aa982",
+      : "#4d8fc8",
+    petDisplayScale: typeof o["petDisplayScale"] === "number" && Number.isFinite(o["petDisplayScale"])
+      ? Math.min(1.4, Math.max(0.6, o["petDisplayScale"]))
+      : 1,
     codexExecutable: typeof o["codexExecutable"] === "string" && o["codexExecutable"].trim()
       ? o["codexExecutable"].trim()
       : "codex",

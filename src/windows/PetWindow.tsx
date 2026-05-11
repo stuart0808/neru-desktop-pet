@@ -24,7 +24,7 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
-function calculatePetMetrics(naturalWidth: number, naturalHeight: number) {
+function calculatePetMetrics(naturalWidth: number, naturalHeight: number, scale = 1) {
   const ratio = naturalWidth > 0 && naturalHeight > 0 ? naturalWidth / naturalHeight : defaultPetMetrics.renderWidth / defaultPetMetrics.renderHeight;
   const maxRenderWidth = 360;
   const maxRenderHeight = 260;
@@ -34,10 +34,11 @@ function calculatePetMetrics(naturalWidth: number, naturalHeight: number) {
     renderWidth = maxRenderWidth;
     renderHeight = maxRenderWidth / ratio;
   }
-  renderWidth = Math.round(clamp(renderWidth, 96, maxRenderWidth));
-  renderHeight = Math.round(clamp(renderHeight, 150, maxRenderHeight));
-  const collapsedWidth = Math.round(clamp(renderWidth + 32, 140, 420));
-  const collapsedHeight = Math.round(clamp(renderHeight + 40, 190, 340));
+  const petScale = clamp(scale, 0.6, 1.4);
+  renderWidth = Math.round(clamp(renderWidth, 96, maxRenderWidth) * petScale);
+  renderHeight = Math.round(clamp(renderHeight, 150, maxRenderHeight) * petScale);
+  const collapsedWidth = Math.round(clamp(renderWidth + 32, 140, 560));
+  const collapsedHeight = Math.round(clamp(renderHeight + 40, 190, 420));
   return {
     renderWidth,
     renderHeight,
@@ -45,8 +46,8 @@ function calculatePetMetrics(naturalWidth: number, naturalHeight: number) {
     layout: {
       collapsed: { width: collapsedWidth, height: collapsedHeight },
       expanded: {
-        width: Math.round(clamp(Math.max(560, collapsedWidth + 140), 560, 760)),
-        height: Math.round(clamp(Math.max(720, collapsedHeight + 360), 720, 860))
+        width: Math.round(clamp(Math.max(560, collapsedWidth + 140), 560, 860)),
+        height: Math.round(clamp(Math.max(720, collapsedHeight + 360), 720, 940))
       }
     }
   };
@@ -117,6 +118,7 @@ export function PetWindow() {
     () => mergePetImages(petStateImages, settings?.petAppearance?.images),
     [settings?.petAppearance?.images]
   );
+  const petDisplayScale = settings?.petDisplayScale ?? 1;
   const petStageStyle = React.useMemo(
     () => ({
       ...themeStyle,
@@ -190,13 +192,13 @@ export function PetWindow() {
   React.useEffect(() => {
     const image = new Image();
     image.onload = () => {
-      setPetMetrics(calculatePetMetrics(image.naturalWidth, image.naturalHeight));
+      setPetMetrics(calculatePetMetrics(image.naturalWidth, image.naturalHeight, petDisplayScale));
     };
     image.onerror = () => {
-      setPetMetrics(defaultPetMetrics);
+      setPetMetrics(calculatePetMetrics(defaultPetMetrics.renderWidth, defaultPetMetrics.renderHeight, petDisplayScale));
     };
     image.src = currentPetImages.idle;
-  }, [currentPetImages.idle]);
+  }, [currentPetImages.idle, petDisplayScale]);
 
   React.useEffect(() => {
     if (!api) return;

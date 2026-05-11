@@ -24,7 +24,7 @@ export const petStateImages: Record<PetVisualState, string> = {
   sleepy: sleepyImage
 };
 
-export const workspaceThemePresets = ["#5aa982", "#4d8fc8", "#d59a3a", "#c56c86", "#8a75c9", "#5c8f7a"];
+export const workspaceThemePresets = ["#4d8fc8", "#5aa982", "#d59a3a", "#c56c86", "#8a75c9", "#5c8f7a"];
 
 export const codexSlashCommands = [
   { command: "/permissions", description: "检查或调整 Codex 能做什么。" },

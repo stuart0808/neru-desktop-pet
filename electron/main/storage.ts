@@ -30,7 +30,8 @@ const defaultSettings: AppSettings = {
   keepChatHistory: true,
   selectionToolsEnabled: true,
   quickAiRecordShortcut: "CommandOrControl+Shift+Space",
-  workspaceThemeColor: "#5aa982",
+  workspaceThemeColor: "#4d8fc8",
+  petDisplayScale: 1,
   codexExecutable: "codex",
   codexDefaultSandbox: "workspace-write",
   codexDefaultApproval: "on-request",
@@ -319,6 +320,7 @@ function normalizeSettings(settings: AppSettings): AppSettings {
     selectionToolsEnabled: settings.selectionToolsEnabled !== false,
     quickAiRecordShortcut: normalizeNonEmptyString(settings.quickAiRecordShortcut) ?? "CommandOrControl+Shift+Space",
     workspaceThemeColor: normalizeThemeColor(settings.workspaceThemeColor),
+    petDisplayScale: normalizePetDisplayScale(settings.petDisplayScale),
     codexExecutable: normalizeNonEmptyString(settings.codexExecutable) ?? "codex",
     codexDefaultSandbox: normalizeCodexSandbox(settings.codexDefaultSandbox),
     codexDefaultApproval: normalizeCodexApproval(settings.codexDefaultApproval),
@@ -362,5 +364,10 @@ function normalizeOptionalString(value: string | undefined): string | undefined 
 }
 
 function normalizeThemeColor(value: string | undefined): string {
-  return typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value) ? value : "#5aa982";
+  return typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value) ? value : "#4d8fc8";
+}
+
+function normalizePetDisplayScale(value: number | undefined): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return 1;
+  return Math.min(1.4, Math.max(0.6, value));
 }

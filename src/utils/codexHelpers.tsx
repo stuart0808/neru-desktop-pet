@@ -177,6 +177,22 @@ export function getCodexModelLabel(modelId: string, models: CodexModelSummary[])
   return model?.displayName ? `${model.displayName}` : modelId;
 }
 
+export function translateCodexStatusText(text: string, t: (text: string, params?: Record<string, string | number>) => string): string {
+  const switchedPrefix = "当前线程已切换到 ";
+  if (text.startsWith(switchedPrefix)) {
+    const value = text.slice(switchedPrefix.length);
+    const [model, effort] = value.split(" / ");
+    return effort
+      ? t("当前线程已切换到 {model} / {effort}", { model, effort })
+      : t("当前线程已切换到 {model}", { model });
+  }
+  const resumeFailedPrefix = "线程恢复失败：";
+  if (text.startsWith(resumeFailedPrefix)) {
+    return t("线程恢复失败：{message}", { message: t(text.slice(resumeFailedPrefix.length)) });
+  }
+  return t(text);
+}
+
 export function rememberCodexInput(text: string, setHistory: React.Dispatch<React.SetStateAction<string[]>>) {
   setHistory((current) => {
     const deduped = current.filter((item) => item !== text);

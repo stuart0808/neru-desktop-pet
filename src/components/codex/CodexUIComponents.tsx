@@ -117,6 +117,22 @@ function getActivityStatusKind(status: string): "done" | "active" | "failed" | "
   return "neutral";
 }
 
+function translateSuggestionDescription(description: string, t: (text: string, params?: Record<string, string | number>) => string): string {
+  const reasoningPrefix = "默认推理强度: ";
+  if (description.startsWith(reasoningPrefix)) {
+    return t("默认推理强度: {effort}", { effort: description.slice(reasoningPrefix.length) });
+  }
+  return t(description);
+}
+
+function translateActivityTitle(title: string, t: (text: string, params?: Record<string, string | number>) => string): string {
+  const commandPrefix = "命令：";
+  if (title.startsWith(commandPrefix)) {
+    return t("命令：{command}", { command: title.slice(commandPrefix.length) });
+  }
+  return t(title);
+}
+
 function parseRawEvent(raw: string) {
   try {
     return JSON.parse(raw) as Record<string, any>;
@@ -209,13 +225,13 @@ export function CodexActivityDrawer({
                     <button type="button" className="codex-activity-row-header" onClick={() => setExpandedActivityIds((current) => ({ ...current, [item.id]: !expanded }))}>
                       <span className="codex-activity-row-icon">{getActivityIcon(item.type)}</span>
                       <span className="codex-activity-row-main">
-                        <strong>{item.title}</strong>
+                        <strong>{translateActivityTitle(item.title, t)}</strong>
                         <span>{getActivityTypeLabel(item.type, t)} · {t(getActivitySummary(item))}</span>
                       </span>
                       {item.status && (
                         <span className="codex-activity-status" data-status-kind={statusKind}>
                           <span aria-hidden="true" />
-                          <span>{item.status}</span>
+                          <span>{t(item.status)}</span>
                         </span>
                       )}
                       {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -321,7 +337,7 @@ export function CodexSuggestionPicker({
             <span aria-hidden="true" className="codex-suggestion-marker">{index === activeIndex ? <Check size={12} /> : null}</span>
             <span className="codex-suggestion-main">
               <strong>{suggestion.label}</strong>
-              {suggestion.description && <span>{suggestion.description}</span>}
+              {suggestion.description && <span>{translateSuggestionDescription(suggestion.description, t)}</span>}
             </span>
           </button>
         ))}

@@ -20,14 +20,14 @@ input {
 }
 
 .shell {
-  --workspace-accent: #5aa982;
-  --workspace-bg: #eef7f2;
-  --workspace-soft: #f7fbf8;
+  --workspace-accent: #4d8fc8;
+  --workspace-bg: rgb(230, 239, 247);
+  --workspace-soft: rgb(212, 228, 242);
   --workspace-active: rgba(255, 255, 255, .86);
-  --workspace-card-bg: rgba(250, 252, 249, .94);
-  --workspace-content-bg: rgba(255, 255, 255, .5);
-  --workspace-border: rgba(40, 66, 63, .16);
-  --workspace-shadow: rgba(21, 40, 38, .12);
+  --workspace-card-bg: rgb(244, 248, 252);
+  --workspace-content-bg: rgb(234, 242, 248);
+  --workspace-border: rgba(77, 143, 200, .28);
+  --workspace-shadow: rgba(77, 143, 200, .12);
   --pet-render-width: 123px;
   --pet-render-height: 260px;
   --pet-bubble-bottom: 274px;
@@ -767,14 +767,14 @@ input {
 }
 
 .selection-result-shell {
-  --workspace-accent: #5aa982;
-  --workspace-bg: #eef7f2;
-  --workspace-soft: #f7fbf8;
+  --workspace-accent: #4d8fc8;
+  --workspace-bg: rgb(230, 239, 247);
+  --workspace-soft: rgb(212, 228, 242);
   --workspace-active: rgba(255, 255, 255, .86);
-  --workspace-card-bg: rgba(250, 252, 249, .94);
-  --workspace-content-bg: rgba(255, 255, 255, .5);
-  --workspace-border: rgba(40, 66, 63, .16);
-  --workspace-shadow: rgba(21, 40, 38, .12);
+  --workspace-card-bg: rgb(244, 248, 252);
+  --workspace-content-bg: rgb(234, 242, 248);
+  --workspace-border: rgba(77, 143, 200, .28);
+  --workspace-shadow: rgba(77, 143, 200, .12);
   width: 100%;
   height: 100%;
   display: grid;
@@ -848,14 +848,14 @@ input {
 }
 
 .global-selection-popover-shell {
-  --workspace-accent: #5aa982;
-  --workspace-bg: #eef7f2;
-  --workspace-soft: #f7fbf8;
+  --workspace-accent: #4d8fc8;
+  --workspace-bg: rgb(230, 239, 247);
+  --workspace-soft: rgb(212, 228, 242);
   --workspace-active: rgba(255, 255, 255, .86);
-  --workspace-card-bg: rgba(250, 252, 249, .94);
-  --workspace-content-bg: rgba(255, 255, 255, .5);
-  --workspace-border: rgba(40, 66, 63, .16);
-  --workspace-shadow: rgba(21, 40, 38, .16);
+  --workspace-card-bg: rgb(244, 248, 252);
+  --workspace-content-bg: rgb(234, 242, 248);
+  --workspace-border: rgba(77, 143, 200, .28);
+  --workspace-shadow: rgba(77, 143, 200, .16);
   position: absolute;
   top: 0;
   left: 0;
@@ -1485,7 +1485,7 @@ input {
 }
 
 .theme-swatch.active {
-  box-shadow: 0 0 0 2px var(--workspace-accent, #5aa982), 0 6px 14px var(--workspace-shadow, rgba(21, 40, 38, .12));
+  box-shadow: 0 0 0 2px var(--workspace-accent, #4d8fc8), 0 6px 14px var(--workspace-shadow, rgba(21, 40, 38, .12));
 }
 
 .theme-picker {
@@ -1534,6 +1534,55 @@ input {
   font-size: 12px;
   line-height: 1.4;
   overflow-wrap: anywhere;
+}
+
+.pet-size-control {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--workspace-border, rgba(39, 70, 65, .14));
+  border-radius: 7px;
+  padding: 9px 10px;
+  background: rgba(255, 255, 255, .72);
+}
+
+.pet-size-header,
+.pet-size-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pet-size-header span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #25413e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pet-size-header strong {
+  color: var(--workspace-accent, #4d8fc8);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pet-size-control input[type="range"] {
+  width: 100%;
+  min-width: 0;
+  accent-color: var(--workspace-accent, #4d8fc8);
+}
+
+.pet-size-footer span {
+  color: #61716e;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pet-size-footer .settings-action {
+  min-height: 28px;
+  padding: 5px 8px;
 }
 
 .appearance-actions {
@@ -1632,7 +1681,7 @@ input {
 
 .toggle.on .toggle-switch {
   border-color: rgba(60, 126, 99, .28);
-  background: var(--workspace-accent, #5aa982);
+  background: var(--workspace-accent, #4d8fc8);
 }
 
 .toggle.on .toggle-thumb {
@@ -1685,14 +1734,14 @@ input {
 }
 
 .workspace-shell {
-  --workspace-accent: #5aa982;
-  --workspace-bg: #eef7f2;
-  --workspace-soft: #f7fbf8;
+  --workspace-accent: #4d8fc8;
+  --workspace-bg: rgb(230, 239, 247);
+  --workspace-soft: rgb(212, 228, 242);
   --workspace-active: rgba(255, 255, 255, .86);
-  --workspace-card-bg: rgba(250, 252, 249, .94);
-  --workspace-content-bg: rgba(255, 255, 255, .5);
-  --workspace-border: rgba(40, 66, 63, .16);
-  --workspace-shadow: rgba(21, 40, 38, .12);
+  --workspace-card-bg: rgb(244, 248, 252);
+  --workspace-content-bg: rgb(234, 242, 248);
+  --workspace-border: rgba(77, 143, 200, .28);
+  --workspace-shadow: rgba(77, 143, 200, .12);
   width: 100%;
   height: 100%;
   display: grid;
@@ -3794,14 +3843,14 @@ input {
 }
 
 .codex-window {
-  --workspace-accent: #5aa982;
-  --workspace-bg: #eef7f2;
-  --workspace-soft: #f7fbf8;
+  --workspace-accent: #4d8fc8;
+  --workspace-bg: rgb(230, 239, 247);
+  --workspace-soft: rgb(212, 228, 242);
   --workspace-active: rgba(255, 255, 255, .86);
-  --workspace-card-bg: rgba(250, 252, 249, .94);
-  --workspace-content-bg: rgba(255, 255, 255, .5);
-  --workspace-border: rgba(40, 66, 63, .16);
-  --workspace-shadow: rgba(21, 40, 38, .12);
+  --workspace-card-bg: rgb(244, 248, 252);
+  --workspace-content-bg: rgb(234, 242, 248);
+  --workspace-border: rgba(77, 143, 200, .28);
+  --workspace-shadow: rgba(77, 143, 200, .12);
   width: 100%;
   height: 100%;
   display: grid;

@@ -68,6 +68,7 @@ export interface AppSettings {
   selectionToolsEnabled: boolean;
   quickAiRecordShortcut: string;
   workspaceThemeColor: string;
+  petDisplayScale: number;
   codexExecutable: string;
   codexDefaultSandbox: CodexSandboxPolicy;
   codexDefaultApproval: CodexApprovalPolicy;

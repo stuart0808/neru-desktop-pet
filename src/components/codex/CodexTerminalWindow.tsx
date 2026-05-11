@@ -1,7 +1,7 @@
 import React from "react";
 import { FileText, FolderOpen, ListTodo, Save, Send, Sparkles, Square } from "lucide-react";
 import type { CodexApprovalPolicy, CodexModelSummary, CodexPendingRequest, CodexSandboxPolicy, CodexSessionInfo, CodexThreadSummary, CodexUiActivity, CodexUiMessage, DesktopPetApi, SelectionReference } from "../../../shared/types";
-import { applyCodexThreadEventToSession, applyCodexUiEvent, getCodexActiveThreadSettings, getCodexApprovalLabel, getCodexEventThreadId, getCodexInputSuggestions, getCodexSandboxLabel, getNextCodexInputHistory, handleLocalCodexCommand, rememberCodexInput, resolveCodexDisplayPath } from "../../utils/codexHelpers";
+import { applyCodexThreadEventToSession, applyCodexUiEvent, getCodexActiveThreadSettings, getCodexApprovalLabel, getCodexEventThreadId, getCodexInputSuggestions, getCodexSandboxLabel, getNextCodexInputHistory, handleLocalCodexCommand, rememberCodexInput, resolveCodexDisplayPath, translateCodexStatusText } from "../../utils/codexHelpers";
 import { MarkdownText } from "./MarkdownText";
 import { CodexRequestCard, getCodexRequestActions, isCommandExecutionApprovalRequest } from "./CodexRequestCard";
 import { CodexActivityDrawer, CodexResumePicker, CodexSuggestionPicker, CodexThinkingMessage, CodexThreadBadges } from "./CodexUIComponents";
@@ -439,7 +439,7 @@ export function CodexTerminalWindow({
           <strong>Neru Codex</strong>
           <span>{session?.workspacePath ?? t("加载工作目录...")}</span>
         </div>
-        <div className={`codex-status ${status}`}>{statusText}</div>
+        <div className={`codex-status ${status}`}>{translateCodexStatusText(statusText, t)}</div>
         {session && (
           <CodexActivityDrawer
             activity={activity}

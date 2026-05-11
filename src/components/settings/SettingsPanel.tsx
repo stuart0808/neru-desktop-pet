@@ -1,5 +1,5 @@
 import React from "react";
-import { Bell, FolderOpen, Image as ImageIcon, KeyRound, RotateCcw, Settings, Sparkles, Trash2 } from "lucide-react";
+import { Bell, FolderOpen, Image as ImageIcon, KeyRound, RotateCcw, Settings, SlidersHorizontal, Sparkles, Trash2 } from "lucide-react";
 import type { AppSettings, CodexApprovalPolicy, CodexSandboxPolicy, DesktopPetApi } from "../../../shared/types";
 import { aiProviderPresets, workspaceThemePresets } from "../../utils/constants";
 import { getCodexApprovalLabel, getCodexSandboxLabel } from "../../utils/codexHelpers";
@@ -29,6 +29,7 @@ export function SettingsPanel({
   const [aiBaseUrl, setAiBaseUrl] = React.useState(settings.aiBaseUrl ?? aiProviderPresets[settings.aiProvider].baseUrl);
   const [aiModel, setAiModel] = React.useState(settings.aiModel ?? settings.openAiModel);
   const [themeColor, setThemeColor] = React.useState(settings.workspaceThemeColor);
+  const [petDisplayScale, setPetDisplayScale] = React.useState(settings.petDisplayScale);
   const [quickAiRecordShortcut, setQuickAiRecordShortcut] = React.useState(settings.quickAiRecordShortcut);
   const [codexExecutable, setCodexExecutable] = React.useState(settings.codexExecutable);
   const [apiTestBusy, setApiTestBusy] = React.useState(false);
@@ -40,6 +41,10 @@ export function SettingsPanel({
   React.useEffect(() => {
     setThemeColor(settings.workspaceThemeColor);
   }, [settings.workspaceThemeColor]);
+
+  React.useEffect(() => {
+    setPetDisplayScale(settings.petDisplayScale);
+  }, [settings.petDisplayScale]);
 
   React.useEffect(() => {
     setApiKey(settings.aiApiKey ?? settings.openAiApiKey ?? "");
@@ -64,6 +69,12 @@ export function SettingsPanel({
     if (/^#[0-9a-fA-F]{6}$/.test(value)) {
       onChange({ workspaceThemeColor: value });
     }
+  }
+
+  function updatePetDisplayScale(value: number) {
+    const next = Math.min(1.4, Math.max(0.6, value));
+    setPetDisplayScale(next);
+    onChange({ petDisplayScale: next });
   }
 
   function changeAiProvider(provider: AppSettings["aiProvider"]) {
@@ -157,6 +168,10 @@ export function SettingsPanel({
     return `${value >= 10 || unitIndex === 0 ? value.toFixed(0) : value.toFixed(1)} ${units[unitIndex]}`;
   }
 
+  function formatPercent(value: number): string {
+    return `${Math.round(value * 100)}%`;
+  }
+
   return (
     <section className="settings">
       <div className="settings-overview">
@@ -196,8 +211,8 @@ export function SettingsPanel({
               <input
                 value={aiProviderName}
                 onChange={(event) => setAiProviderName(event.target.value)}
-                onBlur={() => persistAiConfig({ aiProviderName: aiProviderName || "自定义提供商" })}
-                placeholder="例如 OpenRouter / SiliconFlow"
+                onBlur={() => persistAiConfig({ aiProviderName: aiProviderName || t("自定义提供商") })}
+                placeholder={t("例如 OpenRouter / SiliconFlow")}
               />
             </label>
           )}
@@ -370,6 +385,33 @@ export function SettingsPanel({
             <strong>{settings.petAppearance?.name ?? t("默认 Neru")}</strong>
             <span>{settings.petAppearance?.directory ?? t("使用内置状态图片")}</span>
           </div>
+          <div className="pet-size-control">
+            <div className="pet-size-header">
+              <span><SlidersHorizontal size={14} /> {t("桌宠展示大小")}</span>
+              <strong>{formatPercent(petDisplayScale)}</strong>
+            </div>
+            <input
+              type="range"
+              min="0.6"
+              max="1.4"
+              step="0.05"
+              value={petDisplayScale}
+              onChange={(event) => updatePetDisplayScale(Number(event.target.value))}
+              aria-label={t("桌宠展示大小")}
+            />
+            <div className="pet-size-footer">
+              <span>60%</span>
+              <button
+                className="settings-action"
+                type="button"
+                onClick={() => updatePetDisplayScale(1)}
+                disabled={Math.abs(petDisplayScale - 1) < 0.001}
+              >
+                <RotateCcw size={14} /> {t("恢复 100%")}
+              </button>
+              <span>140%</span>
+            </div>
+          </div>
           <div className="appearance-actions">
             <button className="settings-action" onClick={onSelectPetAppearance}>
               <FolderOpen size={15} /> {t("选择形象文件夹")}
@@ -380,7 +422,7 @@ export function SettingsPanel({
               </button>
             )}
           </div>
-          <div className="setting-hint">{t("文件夹名需为 {name}_state，图片文件名如 _Idle_.png、_Talking_.png。", { name: "{角色名}" })}</div>
+          <div className="setting-hint">{t("文件夹名需为 {name}_state，图片文件名如 _Idle_.png、_Talking_.png。", { name: t("角色名") })}</div>
         </section>
 
         <section className="settings-section behavior-setting" aria-label={t("桌宠行为")}>

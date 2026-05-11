@@ -1,9 +1,11 @@
 import React from "react";
 import { FolderOpen, RotateCcw, Trash2 } from "lucide-react";
 import type { AppSettings, CodexApprovalPolicy, CodexSandboxPolicy, CodexSavedSession, CodexSessionInfo, DesktopPetApi } from "../../../shared/types";
+import { useI18n } from "../../i18n";
 import { CodexEmbeddedConversation } from "./CodexEmbeddedConversation";
 
 export function CodexWorkspacePanel({ api, settings }: { api?: DesktopPetApi; settings: AppSettings | null }) {
+  const { t } = useI18n();
   const [savedSessions, setSavedSessions] = React.useState<CodexSavedSession[]>([]);
   const [activeSession, setActiveSession] = React.useState<CodexSessionInfo | null>(null);
   const [busy, setBusy] = React.useState(false);
@@ -21,8 +23,8 @@ export function CodexWorkspacePanel({ api, settings }: { api?: DesktopPetApi; se
   }, [api]);
 
   React.useEffect(() => {
-    void refresh().catch((reason) => setError(reason instanceof Error ? reason.message : "读取 Codex 会话失败。"));
-  }, [refresh]);
+    void refresh().catch((reason) => setError(reason instanceof Error ? reason.message : t("读取 Codex 会话失败。")));
+  }, [refresh, t]);
 
   async function startFromFolder() {
     if (!api || busy) return;
@@ -33,7 +35,7 @@ export function CodexWorkspacePanel({ api, settings }: { api?: DesktopPetApi; se
       await refresh();
       if (session) setActiveSession(session);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "启动 Codex 失败。");
+      setError(reason instanceof Error ? reason.message : t("启动 Codex 失败。"));
     } finally {
       setBusy(false);
     }
@@ -47,7 +49,7 @@ export function CodexWorkspacePanel({ api, settings }: { api?: DesktopPetApi; se
       const next = await api.codex.openSavedSession(session.id, { sandbox, approval });
       setActiveSession(next);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "打开保存会话失败。");
+      setError(reason instanceof Error ? reason.message : t("打开保存会话失败。"));
     } finally {
       setOpeningId("");
     }
@@ -62,13 +64,13 @@ export function CodexWorkspacePanel({ api, settings }: { api?: DesktopPetApi; se
       await api.codex.renameSavedSession(session.id, nextName);
       await refresh();
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "重命名失败。");
+      setError(reason instanceof Error ? reason.message : t("重命名失败。"));
     }
   }
 
   async function deleteSaved(session: CodexSavedSession) {
     if (!api || deletingIds.includes(session.id)) return;
-    const confirmed = window.confirm(`删除 Codex 对话"${session.name}"？对应的副本文件夹也会被删除。`);
+    const confirmed = window.confirm(t("删除 Codex 对话“{name}”？对应的副本文件夹也会被删除。", { name: session.name }));
     if (!confirmed) return;
     setError("");
     setDeletingIds((current) => [...current, session.id]);
@@ -78,7 +80,7 @@ export function CodexWorkspacePanel({ api, settings }: { api?: DesktopPetApi; se
       await api.codex.deleteSavedSession(session.id);
       await refresh();
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "删除失败。");
+      setError(reason instanceof Error ? reason.message : t("删除失败。"));
       await refresh();
     } finally {
       setDeletingIds((current) => current.filter((id) => id !== session.id));
@@ -90,22 +92,22 @@ export function CodexWorkspacePanel({ api, settings }: { api?: DesktopPetApi; se
       <div className="section-title">
         <span>Codex</span>
         <button type="button" className="summary-generate-button" onClick={() => void refresh()} disabled={busy}>
-          <RotateCcw size={14} /> 刷新
+          <RotateCcw size={14} /> {t("刷新")}
         </button>
       </div>
       <div className="codex-workspace-body">
         <aside className="codex-workspace-sidebar">
           <div className="codex-start-panel">
             <button type="button" onClick={() => void startFromFolder()} disabled={!api || busy}>
-              <FolderOpen size={15} /> 选择文件夹
+              <FolderOpen size={15} /> {t("选择文件夹")}
             </button>
             {error && <div className="codex-error">{error}</div>}
           </div>
           <div className="codex-saved-panel">
-            <strong>保存的对话</strong>
+            <strong>{t("保存的对话")}</strong>
             <div className="codex-saved-list">
               {savedSessions.length === 0 ? (
-                <div className="summary-empty">还没有保存的 Codex 会话。</div>
+                <div className="summary-empty">{t("还没有保存的 Codex 会话。")}</div>
               ) : savedSessions.map((session) => (
                 <article key={session.id} className={`codex-saved-item ${activeSession?.savedPath === session.rootPath || activeSession?.workspacePath === session.workspacePath ? "active" : ""}`}>
                   <button type="button" className="codex-saved-main" onClick={() => void openSaved(session)} disabled={deletingIds.includes(session.id)}>
@@ -132,10 +134,10 @@ export function CodexWorkspacePanel({ api, settings }: { api?: DesktopPetApi; se
                         {session.name}
                       </strong>
                     )}
-                    <span>{openingId === session.id ? "正在打开..." : new Date(session.createdAt).toLocaleString()}</span>
+                    <span>{openingId === session.id ? t("正在打开...") : new Date(session.createdAt).toLocaleString()}</span>
                     <small>{session.workspacePath}</small>
                   </button>
-                  <button type="button" className="codex-saved-delete" onClick={() => void deleteSaved(session)} disabled={deletingIds.includes(session.id)} aria-label={`删除 ${session.name}`}>
+                  <button type="button" className="codex-saved-delete" onClick={() => void deleteSaved(session)} disabled={deletingIds.includes(session.id)} aria-label={t("删除 {name}", { name: session.name })}>
                     <Trash2 size={13} />
                   </button>
                 </article>
@@ -154,7 +156,7 @@ export function CodexWorkspacePanel({ api, settings }: { api?: DesktopPetApi; se
               onSessionChange={setActiveSession}
             />
           ) : (
-            <div className="codex-empty codex-workspace-empty">选择一个历史对话，或先选择文件夹开始。</div>
+            <div className="codex-empty codex-workspace-empty">{t("选择一个历史对话，或先选择文件夹开始。")}</div>
           )}
         </section>
       </div>

@@ -27,6 +27,13 @@ export function PlanProposalCard({
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
   const visibleItems = compact ? plan.items.slice(0, 4) : plan.items;
 
+  function getPlanSummary(): string {
+    const countMatch = plan.summary.match(/^待办草案（(\d+) 项）$/);
+    if (countMatch) return t("待办草案（{count} 项）", { count: countMatch[1] });
+    if (plan.summary === "待办草案") return t("待办草案");
+    return plan.summary || t("任务草案");
+  }
+
   function updateItem(index: number, patch: Partial<TodoCandidate>) {
     onChangeItems(plan.items.map((item, itemIndex) => (itemIndex === index ? { ...item, ...patch } : item)));
   }
@@ -42,7 +49,7 @@ export function PlanProposalCard({
     <section className={`plan-card ${compact ? "compact" : ""}`}>
       <div className="plan-card-header">
         <div>
-          <strong>{plan.summary || t("任务草案")}</strong>
+          <strong>{getPlanSummary()}</strong>
           <span>
             {status === "accepted"
               ? t("已确认保存")

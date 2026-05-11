@@ -5,7 +5,7 @@ import { processSelectedText } from "./openaiClient.js";
 import { JsonStore } from "./storage.js";
 import { state, collapsedPetBounds, expandedPetBounds, selectionPopoverCollapsedBounds, selectionPopoverExpandedBounds, selectionPopoverMaxExpandedBounds } from "./state.js";
 import { broadcastSnapshotUpdated } from "./broadcast.js";
-import { getPreloadPath, getRendererUrl, getAppIconPath, getTrayIcon, getWorkspaceInitialBounds, lockdownWindow, normalizeAccelerator } from "./windowUtils.js";
+import { getPreloadPath, getRendererUrl, getAppIconPath, getShortcutIconPath, getTrayIcon, getWorkspaceInitialBounds, lockdownWindow, normalizeAccelerator } from "./windowUtils.js";
 import { syncGlobalSelectionHook, setOpenSelectionPopoverWindow } from "./selection.js";
 import { setOpenWorkspaceWindow } from "./reminder.js";
 import type { AppSettings, PetWindowLayout, SelectionCapture, SelectionTextResult } from "../../shared/types.js";
@@ -72,7 +72,7 @@ export function ensureWindowsNotificationShortcut(): void {
     args: app.isPackaged ? "" : `"${app.getAppPath()}"`,
     appUserModelId,
     description: "Neru desktop pet",
-    icon: getAppIconPath(),
+    icon: getShortcutIconPath(),
     iconIndex: 0
   });
 }

@@ -125,13 +125,17 @@ const OPTIONAL_STRING_SETTINGS = new Set<keyof AppSettings>([
   "aiApiKey", "openAiApiKey", "skippedUpdateVersion"
 ]);
 
+const NUMBER_SETTINGS = new Set<keyof AppSettings>([
+  "petDisplayScale"
+]);
+
 const KNOWN_SETTINGS_KEYS = new Set<string>([
   "language", "aiProvider", "aiProviderName", "aiBaseUrl", "aiModel", "aiApiKey",
   "openAiApiKey", "openAiModel", "alwaysOnTop", "autoSaveTodos",
   "systemNotifications", "launchAtLogin", "keepChatHistory",
   "selectionToolsEnabled", "quickAiRecordShortcut", "workspaceThemeColor",
   "codexExecutable", "codexDefaultSandbox", "codexDefaultApproval",
-  "skippedUpdateVersion", "petAppearance"
+  "skippedUpdateVersion", "petAppearance", "petDisplayScale"
 ]);
 
 export function validateSettingsPatch(value: unknown): Partial<AppSettings> {
@@ -148,6 +152,7 @@ export function validateSettingsPatch(value: unknown): Partial<AppSettings> {
     if (BOOL_SETTINGS.has(key as keyof AppSettings)) assertBoolean(v, key);
     else if (STRING_SETTINGS.has(key as keyof AppSettings)) assertString(v, key);
     else if (OPTIONAL_STRING_SETTINGS.has(key as keyof AppSettings)) assertOptionalString(v, key);
+    else if (NUMBER_SETTINGS.has(key as keyof AppSettings)) validateFiniteNumber(v, key);
     else if (key === "language") {
       if (v !== "system" && v !== "zh-CN" && v !== "en-US" && v !== "ja-JP" && v !== "ko-KR") {
         throw new Error(`settings key "language" has an invalid value.`);
