@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neru</title>
+  </head>
+  <body>
+    <script>
+      window.addEventListener("error", (event) => {
+        const root = document.getElementById("root");
+        if (!root) return;
+        root.innerHTML = '<div style="min-height:100vh;display:grid;place-items:center;background:#fff3f0;font-family:Segoe UI,sans-serif;color:#421f18;padding:20px;"><pre style="white-space:pre-wrap;max-width:90vw;">Renderer error:\\n' + String(event.message) + '\\n' + String(event.filename || "") + ':' + String(event.lineno || "") + '</pre></div>';
+      });
+      window.addEventListener("unhandledrejection", (event) => {
+        const root = document.getElementById("root");
+        if (!root) return;
+        root.innerHTML = '<div style="min-height:100vh;display:grid;place-items:center;background:#fff3f0;font-family:Segoe UI,sans-serif;color:#421f18;padding:20px;"><pre style="white-space:pre-wrap;max-width:90vw;">Renderer promise error:\\n' + String(event.reason && event.reason.message ? event.reason.message : event.reason) + '</pre></div>';
+      });
+    </script>
+    <div id="root">
+      <div style="min-height:100vh;display:grid;place-items:center;background:#eef7f2;font-family:'Microsoft YaHei','Segoe UI',sans-serif;color:#223031;">
+        <div style="width:360px;max-width:90vw;text-align:center;padding:18px;border:1px solid rgba(39,70,65,.18);border-radius:8px;background:white;box-shadow:0 18px 38px rgba(21,40,38,.18);">
+          <svg viewBox="0 0 240 280" style="width:220px;height:auto;filter:drop-shadow(0 12px 14px rgba(26,47,45,.2));" role="img" aria-label="Q版 Neru 桌宠加载中">
+            <defs>
+              <linearGradient id="fallbackHair" x1="0" x2="1"><stop offset="0" stop-color="#dbefff"/><stop offset="1" stop-color="#f7fbff"/></linearGradient>
+              <linearGradient id="fallbackCoat" x1="0" x2="1"><stop offset="0" stop-color="#315b55"/><stop offset="1" stop-color="#4f8378"/></linearGradient>
+            </defs>
+            <ellipse cx="124" cy="254" rx="58" ry="12" fill="#000" opacity=".12"/>
+            <path d="M62 130c-20 24-22 68-2 96 22 31 91 36 122 7 24-23 21-79-3-105-29-32-90-31-117 2Z" fill="url(#fallbackCoat)"/>
+            <path d="M91 142h65l14 70c-19 18-73 17-93-1l14-69Z" fill="#f2f0e8"/>
+            <path d="M118 146l-16 55 19 20 20-20-17-55h-6Z" fill="#d7ad55"/>
+            <path d="M52 84c8-50 42-76 78-74 41 3 70 35 67 80-2 48-32 83-74 84-43 1-74-34-71-90Z" fill="url(#fallbackHair)"/>
+            <path d="M63 98c-1-51 37-78 71-70 38 9 58 43 49 82-8 35-31 55-65 55-33 0-54-25-55-67Z" fill="#ffe6d7"/>
+            <circle cx="95" cy="103" r="7" fill="#314547"/><circle cx="146" cy="103" r="7" fill="#314547"/>
+            <path d="M111 129c7 4 17 4 24 0" fill="none" stroke="#9d5d55" stroke-width="4" stroke-linecap="round"/>
+            <path d="M108 63h35l8 17-25 13-25-13 7-17Z" fill="#d2a040"/>
+            <path d="M194 151c20 9 28 31 19 50-5 11-17 18-30 18 14-24 16-45 11-68Z" fill="#7b6042"/>
+          </svg>
+          <div style="margin-top:10px;font-size:14px;">Neru 正在加载...</div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
