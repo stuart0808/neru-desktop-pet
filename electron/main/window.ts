@@ -5,7 +5,7 @@ import { processSelectedText } from "./openaiClient.js";
 import { JsonStore } from "./storage.js";
 import { state, collapsedPetBounds, expandedPetBounds, selectionPopoverCollapsedBounds, selectionPopoverExpandedBounds, selectionPopoverMaxExpandedBounds } from "./state.js";
 import { broadcastSnapshotUpdated } from "./broadcast.js";
-import { getPreloadPath, getRendererUrl, getAppIconPath, getShortcutIconPath, getTrayIcon, getWorkspaceInitialBounds, lockdownWindow, normalizeAccelerator } from "./windowUtils.js";
+import { getPreloadPath, getRendererUrl, getShortcutIconPath, getTrayIcon, getWindowIcon, getWorkspaceInitialBounds, lockdownWindow, normalizeAccelerator } from "./windowUtils.js";
 import { syncGlobalSelectionHook, setOpenSelectionPopoverWindow } from "./selection.js";
 import { setOpenWorkspaceWindow } from "./reminder.js";
 import type { AppSettings, PetWindowLayout, SelectionCapture, SelectionTextResult } from "../../shared/types.js";
@@ -90,7 +90,7 @@ export async function createWindow(): Promise<void> {
     y: 80,
     show: false,
     title: "Neru",
-    icon: getAppIconPath(),
+    icon: getWindowIcon(),
     frame: !transparentMode,
     transparent: transparentMode,
     backgroundColor: transparentMode ? "#00000000" : "#eef7f2",
@@ -234,7 +234,7 @@ export async function openWorkspaceWindow(todoId?: string): Promise<void> {
     minHeight: initialBounds.minHeight,
     show: false,
     title: translate(locale, "Neru 待办与对话"),
-    icon: getAppIconPath(),
+    icon: getWindowIcon(),
     backgroundColor: "#eef7f2",
     resizable: true,
     alwaysOnTop: false,
@@ -270,7 +270,7 @@ export async function openSelectionResultWindow(result: SelectionTextResult): Pr
     minHeight: 260,
     show: false,
     title: result.title,
-    icon: getAppIconPath(),
+    icon: getWindowIcon(),
     backgroundColor: "#f7fbf8",
     resizable: true,
     alwaysOnTop: false,
@@ -352,7 +352,7 @@ export async function openSelectionPopoverWindow(capture: SelectionCapture, x: n
     skipTaskbar: true,
     focusable: false,
     title: translate(locale, "Neru 选中文本"),
-    icon: getAppIconPath(),
+    icon: getWindowIcon(),
     backgroundColor: "#00000000",
     webPreferences: {
       preload: getPreloadPath(),

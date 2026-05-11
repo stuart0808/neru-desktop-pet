@@ -30,6 +30,16 @@
       "src/assets/app/**/*",
       "package.json"
     ],
+    "extraResources": [
+      {
+        "from": "src/assets/app",
+        "to": "assets/app",
+        "filter": [
+          "neru-icon.ico",
+          "neru-icon.png"
+        ]
+      }
+    ],
     "win": {
       "icon": "src/assets/app/neru-icon.ico",
       "signAndEditExecutable": false,

@@ -11,7 +11,7 @@ import { resolveLocale, translate } from "../../shared/i18n.js";
 import { state, type CodexRuntimeSession } from "./state.js";
 import { JsonStore } from "./storage.js";
 import { broadcastCodexEvent } from "./broadcast.js";
-import { getPreloadPath, getRendererUrl, getAppIconPath, lockdownWindow } from "./windowUtils.js";
+import { getPreloadPath, getRendererUrl, getWindowIcon, lockdownWindow } from "./windowUtils.js";
 import { setCreateCodexSession } from "./selection.js";
 
 const store = new JsonStore();
@@ -354,7 +354,7 @@ export async function openCodexWindow(sessionId: string, options: CodexCreateSes
     minHeight: 460,
     show: false,
     title: "Neru Codex",
-    icon: getAppIconPath(),
+    icon: getWindowIcon(),
     backgroundColor: "#eef7f2",
     resizable: true,
     alwaysOnTop: false,

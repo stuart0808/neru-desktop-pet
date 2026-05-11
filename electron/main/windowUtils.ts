@@ -36,6 +36,12 @@ export function getTrayIcon() {
     : image.resize({ width: 16, height: 16 });
 }
 
+export function getWindowIcon() {
+  if (app.isPackaged && process.platform === "win32") return process.execPath;
+  const image = nativeImage.createFromPath(getAppIconPath());
+  return image.isEmpty() ? getTrayIcon() : image;
+}
+
 export function getShortcutIconPath() {
   return app.isPackaged && process.platform === "win32" ? process.execPath : getAppIconPath();
 }
@@ -43,6 +49,7 @@ export function getShortcutIconPath() {
 function resolveAppAssetPath(name: "neru-icon.ico" | "neru-icon.png") {
   const candidates = app.isPackaged
     ? [
+        join(process.resourcesPath, "assets", "app", name),
         join(app.getAppPath(), "src", "assets", "app", name),
         join(process.resourcesPath, "app.asar", "src", "assets", "app", name),
         join(process.resourcesPath, "app", "src", "assets", "app", name)
